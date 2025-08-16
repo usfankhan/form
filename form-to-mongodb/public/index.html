@@ -1,0 +1,50 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Form → MongoDB</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+  </head>
+  <body style="font-family: system-ui; max-width: 520px; margin: 40px auto;">
+    <h2>Submit Form</h2>
+
+    <form id="form" style="display:grid; gap:12px;">
+      <input id="name" type="text" placeholder="Name (min 3 chars)" required />
+      <input id="email" type="email" placeholder="Email" required />
+      <textarea id="message" placeholder="Message (max 200 chars)" maxlength="200"></textarea>
+      <button type="submit">Submit</button>
+    </form>
+
+    <pre id="out" style="padding:12px; background:#f6f6f6; border-radius:8px;"></pre>
+
+    <script>
+      const form = document.getElementById("form");
+      const out = document.getElementById("out");
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const payload = {
+          name: document.getElementById("name").value.trim(),
+          email: document.getElementById("email").value.trim(),
+          message: document.getElementById("message").value.trim(),
+        };
+
+        try {
+          const res = await fetch("/api/forms", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
+
+          const json = await res.json();
+          out.textContent = JSON.stringify(json, null, 2);
+
+          if (res.ok) form.reset();
+        } catch (err) {
+          out.textContent = "Network error. Try again.";
+        }
+      });
+    </script>
+  </body>
+</html>
